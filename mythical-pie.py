@@ -158,7 +158,7 @@ class FateTable:
       'Information'
     ]
   #@+node:peckj.20130315135233.1455: *3* random event
-  def random_event_happens?(self, gamestate, roll):
+  def random_event_happens(self, gamestate, roll):
     return roll % 11 == 0 and roll / 11 <= gamestate.chaos
 
   def random_event_subject(self):
@@ -224,7 +224,7 @@ class FateTable:
       else:
         answer = 'No'
     event = None
-    if self.random_event_happens?(gamestate, roll):
+    if self.random_event_happens(gamestate, roll):
       event = self.roll_random_event()
     return (answer, event, roll)
     
