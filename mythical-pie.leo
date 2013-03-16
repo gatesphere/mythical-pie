@@ -11,7 +11,7 @@
 <find_panel_settings/>
 <vnodes>
 <v t="peckj.20130315135233.1439" a="E"
-expanded="peckj.20130315135233.1442,peckj.20130315135233.1451,"><vh>@file mythical-pie.py</vh></v>
+expanded="peckj.20130315135233.1442,peckj.20130315135233.1451,peckj.20130315194435.1392,peckj.20130315194435.1402,peckj.20130315194435.1404,peckj.20130315194435.1416,"><vh>@file mythical-pie.py</vh></v>
 </vnodes>
 <tnodes>
 </tnodes>

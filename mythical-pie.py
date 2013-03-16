@@ -7,6 +7,9 @@
 #@+<< imports >>
 #@+node:peckj.20130315135233.1440: ** << imports >>
 import random
+
+gamestate = None
+fatetable = None
 #@-<< imports >>
 #@+others
 #@+node:peckj.20130315135233.1441: ** random rolls
@@ -64,10 +67,6 @@ class Gamestate:
     self.pcs.remove(character)
   #@-others
 
-#@+node:peckj.20130315135233.1450: ** scene/thread/character wrapper class
-class StringWrapper:
-  def init(self, str):
-    self.value = str
 #@+node:peckj.20130315135233.1451: ** fate table class
 class FateTable:
   #@+others
@@ -229,5 +228,222 @@ class FateTable:
     return (answer, event, roll)
     
   #@-others
+#@+node:peckj.20130315194435.1392: ** menus
+def menu():
+  exit = False
+  while not exit:
+    exit = main_menu()
+#@+node:peckj.20130315194435.1394: *3* main menu
+def main_menu():
+  print "\n"
+  print "Main Menu:"
+  #print "  1. Create a new scene"
+  #print "  2. End the current scene"
+  print "  3. Add a PC"
+  print "  4. Remove a PC"
+  print "  5. Add an NPC"
+  print "  6. Remove an NPC"
+  print "  7. Add a thread"
+  print "  8. Close a thread"
+  #print "  9. Roll Fate"
+  print " 10. Roll a random PC"
+  print " 11. Roll a random NPC"
+  print " 12. Roll a random thread"
+  print " 13. List PCs"
+  print " 14. List NPCs"
+  print " 15. List threads"
+  print " 16. List scenes"
+  #print " 17. Print game stats"
+  print "  0. End adventure"
+  choice = raw_input('What is your choice? ')
+  options = {
+    #'1' : create_scene,
+    #'2' : end_scene,
+    '3' : add_pc,
+    '4' : remove_pc,
+    '5' : add_npc,  
+    '6' : remove_npc,
+    '7' : add_thread,
+    '8' : close_thread,
+    #'9' : roll_fate,
+    '10': random_pc,
+    '11': random_npc,
+    '12': random_thread,
+    '13': list_pcs,
+    '14': list_npcs,
+    '15': list_threads,
+    '16': list_scenes,
+    #'17': print_game_stats,
+    '0' : end_adventure
+  }
+  print "\n"
+  if choice in options:
+    return options[choice]()
+  else:
+    return invalid_choice()
+#@+node:peckj.20130315194435.1402: *3* scenes
+#@+node:peckj.20130315194435.1397: *4* create a new scene
+def create_scene():
+  pass
+#@+node:peckj.20130315194435.1406: *4* end current scene
+#@+node:peckj.20130315194435.1407: *4* list scenes
+def list_scenes():
+  print "Scenes in the current game:"
+  if len(gamestate.scenes) > 0:
+    for scene in gamestate.scenes:
+      print "  %s. %s" % (gamestate.scenes.index(scene) + 1, scene)
+  else:
+    print "  None! Please add some!"
+  return False
+#@+node:peckj.20130315194435.1403: *3* pcs
+#@+node:peckj.20130315194435.1395: *4* add a pc
+def add_pc():
+  name = raw_input("What is the PC's name? ")
+  gamestate.add_pc(name)
+#@+node:peckj.20130315194435.1401: *4* remove a pc
+def remove_pc():
+  if len(gamestate.pcs) < 1:
+    print "Please add some PCs to the game first."
+  else:
+    list_pcs()
+    print "  0. Cancel this action"
+    choice = raw_input("Which PC would you like to delete? ")
+    try:
+      choice = int(choice)
+    except ValueError:
+      return invalid_choice()
+    if choice == 0:
+      return False
+    elif choice > 0 and choice <= len(gamestate.pcs):
+      gamestate.pcs.pop(choice - 1)
+    else:
+      return invalid_choice()
+  return False
+#@+node:peckj.20130315194435.1408: *4* roll random pc
+def random_pc():
+  if len(gamestate.pcs) < 1:
+    print "Please add some PCs to the game first."
+  else:
+    print "Rolling a random PC..."
+    print "  %s" % random.choice(gamestate.pcs)
+  return False
+#@+node:peckj.20130315194435.1409: *4* list pcs
+def list_pcs():
+  print "PCs in the current game:"
+  if len(gamestate.pcs) > 0:
+    for pc in gamestate.pcs:
+      print "  %s. %s" % (gamestate.pcs.index(pc) + 1, pc)
+  else:
+    print "  None! Please add some!"
+  return False
+#@+node:peckj.20130315194435.1404: *3* npcs
+#@+node:peckj.20130315194435.1396: *4* create an npc
+def add_npc():
+  name = raw_input("What is the NPC's name? ")
+  gamestate.add_npc(name)
+#@+node:peckj.20130315194435.1410: *4* remove an npc
+def remove_npc():
+  if len(gamestate.npcs) < 1:
+    print "Please add some NPCs to the game first."
+  else:
+    list_npcs()
+    print "  0. Cancel this action"
+    choice = raw_input("Which NPC would you like to delete? ")
+    try:
+      choice = int(choice)
+    except ValueError:
+      return invalid_choice()
+    if choice == 0:
+      return False
+    elif choice > 0 and choice <= len(gamestate.npcs):
+      gamestate.npcs.pop(choice - 1)
+    else:
+      return invalid_choice()
+  return False
+#@+node:peckj.20130315194435.1412: *4* roll random npc
+def random_npc():
+  if len(gamestate.npcs) < 1:
+    print "Please add some NPCs to the game first."
+  else:
+    print "Rolling a random NPC..."
+    print "  %s" % random.choice(gamestate.npcs)
+  return False
+#@+node:peckj.20130315194435.1414: *4* list npcs
+def list_npcs():
+  print "NPCs in the current game:"
+  if len(gamestate.npcs) > 0:
+    for npc in gamestate.npcs:
+      print "  %s. %s" % (gamestate.npcs.index(npc) + 1, npc)
+  else:
+    print "  None! Please add some!"
+  return False
+#@+node:peckj.20130315194435.1405: *3* threads
+#@+node:peckj.20130315194435.1398: *4* create a thread
+def add_thread():
+  name = raw_input("What should the thread be called? ")
+  gamestate.add_thread(name)
+#@+node:peckj.20130315194435.1411: *4* close a thread
+def close_thread():
+  if len(gamestate.threads) < 1:
+    print "Please add some threads to the game first."
+  else:
+    list_threads()
+    print "  0. Cancel this action"
+    choice = raw_input("Which thread would you like to close? ")
+    try:
+      choice = int(choice)
+    except ValueError:
+      return invalid_choice()
+    if choice == 0:
+      return False
+    elif choice > 0 and choice <= len(gamestate.threads):
+      gamestate.threads.pop(choice - 1)
+    else:
+      return invalid_choice()
+  return False
+#@+node:peckj.20130315194435.1413: *4* roll random thread
+def random_thread():
+  if len(gamestate.threads) < 1:
+    print "Please add some threads to the game first."
+  else:
+    print "Rolling a random thread..."
+    print "  %s" % random.choice(gamestate.threads)
+  return False
+#@+node:peckj.20130315194435.1415: *4* list threads
+def list_threads():
+  print "Threads in the current game:"
+  if len(gamestate.threads) > 0:
+    for thread in gamestate.threads:
+      print "  %s. %s" % (gamestate.threads.index(thread) + 1, thread)
+  else:
+    print "  None! Please add some!"
+  return False
+#@+node:peckj.20130315194435.1416: *3* adventure
+#@+node:peckj.20130315194435.1399: *4* end adventure
+def end_adventure():
+  return True
+#@+node:peckj.20130315194435.1417: *4* roll fate
+#@+node:peckj.20130315194435.1418: *4* print game stats
+#@+node:peckj.20130315194435.1400: *3* invalid choice
+def invalid_choice():
+  print "Sorry, that was not a valid choice."
+  return False
+#@+node:peckj.20130315194435.1393: ** main
+def initialize():
+  global gamestate, fatetable
+  gamestate = Gamestate()
+  fatetable = FateTable()
+
+def print_greeting():
+  print "Welcome to Mythical Pie, the GM Emulator!"
+  
+def print_goodbye():
+  print "Goodbye! Hope you enjoyed your adventure!"
+
+if __name__ == "__main__":
+  initialize()
+  print_greeting()
+  menu()
+  print_goodbye()
 #@-others
 #@-leo
