@@ -13,14 +13,14 @@ fatetable = None
 #@-<< imports >>
 #@+others
 #@+node:peckj.20130315135233.1441: ** random rolls
-def roll(faces):
-  random.randint(1,faces)
+def roll_dN(faces):
+  return random.randint(1,faces)
 
 def roll_d10():
-  roll(10)
+  return roll_dN(10)
 
 def roll_d100():
-  roll(100)
+  return roll_dN(100)
 #@+node:peckj.20130315135233.1442: ** gamestate class
 class Gamestate:
   #@+others
@@ -74,20 +74,20 @@ class FateTable:
   def __init__(self):
     # likelihood of the answer being yes
     self.name_to_rank = {
-      'Impossible': 0, 
-      'No way': 1, 
-      'Very unlikely': 2,
-      'Unlikely': 3,
-      '50/50': 4,
-      'Somewhat likely': 5,
-      'Likely': 6,
-      'Very likely': 7,
-      'Near sure thing': 8,
-      'A sure thing': 9,
-      'Has to be': 10 
+      0:  'Impossible', 
+      1:  'No way', 
+      2:  'Very unlikely',
+      3:  'Unlikely',
+      4:  '50/50',
+      5:  'Somewhat likely',
+      6:  'Likely',
+      7:  'Very likely',
+      8:  'Near sure thing',
+      9:  'A sure thing',
+      10: 'Has to be' 
     } 
     # the 'big numbers' on the table
-    # yes_thresholds[chaos_value][name_to_rank['rank']] gives you the right value
+    # yes_thresholds[chaos_value][rank] gives you the right value
     self.yes_thresholds = {
       1: [-20,  0,  5,  5, 10, 20,  25,  45,  50,  55,  80],
       2: [  0,  5,  5, 10, 15, 25,  35,  50,  55,  65,  85],
@@ -158,7 +158,7 @@ class FateTable:
     ]
   #@+node:peckj.20130315135233.1455: *3* random event
   def random_event_happens(self, gamestate, roll):
-    return roll % 11 == 0 and roll / 11 <= gamestate.chaos
+    return (roll % 11 == 0 and roll / 11 <= gamestate.chaos) or roll == 100
 
   def random_event_subject(self):
     return self.event_meaning_subject[roll_d100()-1]
@@ -212,7 +212,7 @@ class FateTable:
       # yes, is it exceptional?
       ex_yes = self.exceptional_yes_thresholds[gamestate.chaos][rank]
       if roll <= ex_yes:
-        answer = 'Exceptional Yes' % roll
+        answer = 'Exceptional Yes'
       else:
         answer = 'Yes'
     else:
@@ -237,15 +237,15 @@ def menu():
 def main_menu():
   print "\n"
   print "Main Menu:"
-  #print "  1. Create a new scene"
-  #print "  2. End the current scene"
+  print "  1. Create a new scene"
+  print "  2. End the current scene"
   print "  3. Add a PC"
   print "  4. Remove a PC"
   print "  5. Add an NPC"
   print "  6. Remove an NPC"
   print "  7. Add a thread"
   print "  8. Close a thread"
-  #print "  9. Roll Fate"
+  print "  9. Roll Fate"
   print " 10. Roll a random PC"
   print " 11. Roll a random NPC"
   print " 12. Roll a random thread"
@@ -253,19 +253,19 @@ def main_menu():
   print " 14. List NPCs"
   print " 15. List threads"
   print " 16. List scenes"
-  #print " 17. Print game stats"
+  print " 17. Print game stats"
   print "  0. End adventure"
   choice = raw_input('What is your choice? ')
   options = {
-    #'1' : create_scene,
-    #'2' : end_scene,
+    '1' : create_scene,
+    '2' : end_scene,
     '3' : add_pc,
     '4' : remove_pc,
     '5' : add_npc,  
     '6' : remove_npc,
     '7' : add_thread,
     '8' : close_thread,
-    #'9' : roll_fate,
+    '9' : roll_fate,
     '10': random_pc,
     '11': random_npc,
     '12': random_thread,
@@ -273,7 +273,7 @@ def main_menu():
     '14': list_npcs,
     '15': list_threads,
     '16': list_scenes,
-    #'17': print_game_stats,
+    '17': print_game_stats,
     '0' : end_adventure
   }
   print "\n"
@@ -284,8 +284,44 @@ def main_menu():
 #@+node:peckj.20130315194435.1402: *3* scenes
 #@+node:peckj.20130315194435.1397: *4* create a new scene
 def create_scene():
-  pass
+  print "Think of a scene setup.  When you're ready, press enter."
+  raw_input("  Press enter.")
+  roll = roll_d10()
+  if roll <= gamestate.chaos:
+    # scene setup is modified
+    if roll % 2 == 0: 
+      # even roll, scene is interrupted
+      print "Oh no! The scene has been interrupted!  The interrupting event is:"
+      focus, action, subject = fatetable.roll_random_event()
+      print "  Focus:   %s" % focus
+      print "  Action:  %s" % action
+      print "  Subject: %s" % subject
+    else:
+      # odd roll, scene is altered
+      print "Ooh, sorry about that!  Scene has been altered."
+  print "Alright, now, what's your scene setup?"
+  scene = raw_input("?> ")
+  gamestate.add_scene(scene)
+  return False
 #@+node:peckj.20130315194435.1406: *4* end current scene
+def end_scene():
+  if len(gamestate.scenes) < 1:
+    print "Please add some Scenes to the game first."
+  else:
+    print "Were the PCs in control of the scene?"
+    print "  1. Yes (less chaotic)"
+    print "  2. No (more chaotic)"
+    choice = raw_input("What is your choice? ")
+    options = {
+      '1': gamestate.decrease_chaos,
+      '2': gamestate.increase_chaos
+    }
+    if choice in options:
+      options[choice]()
+    else:
+      invalid_choice()
+      return end_scene()
+  return False
 #@+node:peckj.20130315194435.1407: *4* list scenes
 def list_scenes():
   print "Scenes in the current game:"
@@ -423,7 +459,42 @@ def list_threads():
 def end_adventure():
   return True
 #@+node:peckj.20130315194435.1417: *4* roll fate
+def roll_fate():
+  print "How likely is your question to be true?"
+  for key in range(len(fatetable.name_to_rank)):
+    print "  %s. %s" % (key + 1, fatetable.name_to_rank[key])
+  print "  0. Cancel this action"
+  choice = raw_input("What is your choice? ")
+  try:
+    choice = int(choice)
+  except ValueError:
+    return invalid_choice()
+  if choice <= len(fatetable.name_to_rank):
+    if choice == 0:
+      return False
+    else:
+      choice -= 1
+      # get a tuple of (answer, roll, event)
+      answer, event, roll = fatetable.roll_fate(gamestate, choice)
+      print "Your answer: %s (roll of %s)" % (answer, roll)
+      if event is not None:
+        focus, subject, action = event
+        print "Random event!"
+        print "  Focus:   %s" % focus
+        print "  Action:  %s" % action
+        print "  Subject: %s" % subject
+    return False
+  else:
+    return invalid_choice()
 #@+node:peckj.20130315194435.1418: *4* print game stats
+def print_game_stats():
+  print "Your game stats:"
+  list_pcs()
+  list_npcs()
+  list_threads()
+  list_scenes()
+  print "Current chaos factor: %s" % gamestate.chaos
+  return False
 #@+node:peckj.20130315194435.1400: *3* invalid choice
 def invalid_choice():
   print "Sorry, that was not a valid choice."
