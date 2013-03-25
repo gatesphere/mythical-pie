@@ -197,6 +197,12 @@ class FateTable:
     action = self.random_event_action()
     subject = self.random_event_subject()
     return (focus, action, subject)
+
+  def roll_complex_question(self):
+    """ returns a tuple consisting of (action, subject) """
+    action = self.random_event_action()
+    subject = self.random_event_subject()
+    return (action, subject)
   #@+node:peckj.20130315135233.1456: *3* rolling
   def roll_fate(self, gamestate, rank):
     """ returns a tuple consisting of (answer, event, roll), where
@@ -246,14 +252,15 @@ def main_menu():
   print "  7. Add a thread"
   print "  8. Close a thread"
   print "  9. Roll Fate"
-  print " 10. Roll a random PC"
-  print " 11. Roll a random NPC"
-  print " 12. Roll a random thread"
-  print " 13. List PCs"
-  print " 14. List NPCs"
-  print " 15. List threads"
-  print " 16. List scenes"
-  print " 17. Print game stats"
+  print " 10. Ask a complex question"
+  print " 11. Roll a random PC"
+  print " 12. Roll a random NPC"
+  print " 13. Roll a random thread"
+  print " 14. List PCs"
+  print " 15. List NPCs"
+  print " 16. List threads"
+  print " 17. List scenes"
+  print " 18. Print game stats"
   print "  0. End adventure"
   choice = raw_input('What is your choice? ')
   options = {
@@ -266,14 +273,15 @@ def main_menu():
     '7' : add_thread,
     '8' : close_thread,
     '9' : roll_fate,
-    '10': random_pc,
-    '11': random_npc,
-    '12': random_thread,
-    '13': list_pcs,
-    '14': list_npcs,
-    '15': list_threads,
-    '16': list_scenes,
-    '17': print_game_stats,
+    '10': complex_question,
+    '11': random_pc,
+    '12': random_npc,
+    '13': random_thread,
+    '14': list_pcs,
+    '15': list_npcs,
+    '16': list_threads,
+    '17': list_scenes,
+    '18': print_game_stats,
     '0' : end_adventure
   }
   print "\n"
@@ -478,7 +486,7 @@ def roll_fate():
       answer, event, roll = fatetable.roll_fate(gamestate, choice)
       print "Your answer: %s (roll of %s)" % (answer, roll)
       if event is not None:
-        focus, subject, action = event
+        focus, action, subject = event
         print "Random event!"
         print "  Focus:   %s" % focus
         print "  Action:  %s" % action
@@ -486,6 +494,12 @@ def roll_fate():
     return False
   else:
     return invalid_choice()
+#@+node:peckj.20130325102011.1544: *4* complex question
+def complex_question():
+  action, subject = fatetable.roll_complex_question()
+  print "  Action:  %s" % action
+  print "  Subject: %s" % subject
+  return False
 #@+node:peckj.20130315194435.1418: *4* print game stats
 def print_game_stats():
   print "Your game stats:"
