@@ -156,6 +156,107 @@ class FateTable:
       'Animals','Weather','Elements','Nature','The public','Leadership','Fame','Anger',
       'Information'
     ]
+    # event focus
+    self.event_focus_standard = {
+      7: 'Remote event',
+      28: 'NPC action',
+      35: 'Introduce a new NPC',
+      45: 'Move toward a thread',
+      52: 'Move away from a thread',
+      55: 'Close a thread',
+      67: 'PC negative',
+      75: 'PC positive',
+      83: 'Ambiguous event',
+      92: 'NPC negative',
+      100: 'NPC positive'
+    }
+    self.event_focus_horror = {
+      10: 'Horror - PC',
+      23: 'Horror - NPC',
+      30: 'Remote event',
+      49: 'NPC action',
+      52: 'New NPC',
+      55: 'Move toward a thread',
+      62: 'Move away from a thread',
+      72: 'PC negative',
+      75: 'PC positive',
+      82: 'Ambiguous event',
+      97: 'NPC negative',
+      100: 'NPC positive'
+    }
+    self.event_focus_action = {
+      16: 'Action!',
+      24: 'Rempote event',
+      44: 'NPC action',
+      52: 'New NPC',
+      56: 'Move toward a thread',
+      64: 'Move away from a thread',
+      76: 'PC negative',
+      80: 'PC positive',
+      84: 'Ambiguous event',
+      96: 'NPC negative',
+      100: 'NPC positive'
+    }
+    self.event_focus_mystery = {
+      8: 'Remote event',
+      20: 'NPC action',
+      32: 'New NPC',
+      52: 'Move toward a thread',
+      64: 'Move away from a thread',
+      72: 'PC negative',
+      80: 'PC positive',
+      88: 'Ambiguous event',
+      96: 'NPC negative',
+      100: 'NPC positive'
+    }
+    self.event_focus_social = {
+      12: 'Drop a bomb!',
+      24: 'Remote event',
+      36: 'NPC action',
+      44: 'New NPC',
+      56: 'Move toward a thread',
+      60: 'Move away from a thread',
+      64: 'Close a thread',
+      72: 'PC negative',
+      80: 'PC positive',
+      92: 'Ambiguous event',
+      96: 'NPC negative',
+      100: 'NPC positive'
+    }
+    self.event_focus_personal = {
+      7: 'Remote event',
+      24: 'NPC action',
+      28: 'PC NPC action',
+      35: 'New NPC',
+      42: 'Move toward a thread',
+      45: 'Move toward a PC thread',
+      50: 'Move away from a thread',
+      52: 'Move away from a PC thread',
+      54: 'Close thread',
+      55: 'Close PC thread',
+      67: 'PC negative',
+      75: 'PC positive',
+      83: 'Ambiguous event',
+      90: 'NPC negative',
+      92: 'PC NPC negative',
+      99: 'NPC positive',
+      100: 'PC NPC positive'
+    }
+    self.event_focus_epic = {
+      12: 'Thread escalates',
+      16: 'Remote event',
+      30: 'NPC action',
+      42: 'New NPC',
+      46: 'Move toward a thread',
+      58: 'Move away from a thread',
+      72: 'PC negative',
+      80: 'PC positive',
+      84: 'Ambiguous event',
+      92: 'NPC negative',
+      100: 'NPC positive'
+    }
+    
+    self.event_focus = [self.event_focus_standard]
   #@+node:peckj.20130315135233.1455: *3* random event
   def random_event_happens(self, gamestate, roll):
     return (roll % 11 == 0 and roll / 11 <= gamestate.chaos) or roll == 100
@@ -168,28 +269,13 @@ class FateTable:
 
   def random_event_focus(self):
     roll = roll_d100()
-    if roll <= 7:
-      return 'Remote event'
-    elif roll <= 28:
-      return 'NPC action'
-    elif roll <= 35:
-      return 'Introduce a new NPC'
-    elif roll <= 45:
-      return 'Move toward a thread'
-    elif roll <= 52:
-      return 'Move away from a thread'
-    elif roll <= 55:
-      return 'Close a thread'
-    elif roll <= 67:
-      return 'PC negative'
-    elif roll <= 75:
-      return 'PC positive'
-    elif roll <= 83:
-      return 'Ambiguous event'
-    elif roll <= 92:
-      return 'NPC negative'
-    else:
-      return 'NPC positive'
+    table = random.choice(self.event_focus)
+    while roll <= 100:
+      r = table.get(roll, None)
+      if r is not None:
+        return r
+      else:
+        roll += 1
 
   def roll_random_event(self):
     """ returns a tuple consisting of (focus, action, subject) """
